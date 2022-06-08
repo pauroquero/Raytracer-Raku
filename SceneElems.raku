@@ -39,8 +39,8 @@ class Camera is export {
         my Int $max_x = $.canvas.width div 2;
         my Int $min_y = -$.canvas.height div 2;
         my Int $max_y = $.canvas.height div 2;
-        for $min_x .. $max_x -> Int $x {
-            for $min_y .. $max_y -> Int $y {
+        for $min_x .. ($max_x - 1) -> Int $x {
+            for $min_y .. ($max_y - 1) -> Int $y {
                 my $canvas_coord = Point2d.new(x => $x, y => $y);
 
                 my $D = $.viewport.CanvasToViewport($canvas_coord, $.canvas.width, $.canvas.height);

@@ -26,8 +26,9 @@ class Sphere is export {
             return (Inf, Inf);
         }
 
-        my Num $t1 = (-$b + sqrt($discriminant)) / (2 * $a);
-        my Num $t2 = (-$b - sqrt($discriminant)) / (2 * $a);
+        my Num $sq = sqrt($discriminant);
+        my Num $t1 = (-$b + $sq) / (2 * $a);
+        my Num $t2 = (-$b - $sq) / (2 * $a);
         return ($t1, $t2);
     }
 }

@@ -8,7 +8,7 @@ class Color is export {
     has Int $.b is rw;
 }
 
-constant BACKGROUND_COLOR is export = Color.new(r => 0, g => 0, b => 0);
+constant BACKGROUND_COLOR is export = Color.new(r => 255, g => 255, b => 255);
 
 class Point2d is export {
     has Int $.x is rw;
