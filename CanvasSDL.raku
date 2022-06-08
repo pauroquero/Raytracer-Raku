@@ -2,18 +2,15 @@ use v6.d;
 
 unit module CanvasSDL;
 use SDL2::Raw;
+use Common;
 
-class Color is export {
-    has Int $.r is rw;
-    has Int $.g is rw;
-    has Int $.b is rw;
-}
 
 class Canvas is export {
-    has Int $.width = 800;
-    has Int $.height = 600;
+    has Int $.width = 200;
+    has Int $.height = 200;
     has $!window;
     has $!render;
+    has $!surface;
 
     method Initialize() {
         die "Error initializing SDL" if SDL_Init(VIDEO) != 0;
@@ -33,12 +30,12 @@ class Canvas is export {
     method Destroy() {
         SDL_Quit();
     }
-    method PutPixel(Int $x, Int $y, Color $color) {
+    method PutPixel(Point2d $coord, Color $color) {
 
         SDL_SetRenderDrawColor($!render, $color.r, $color.g, $color.b, 255);
 
-        my ($screen_x, $screen_y) = $.TransformCoordinates($x, $y);
-        SDL_RenderDrawPoint($!render, $screen_x.Int, $screen_y.Int);
+        my Point2d $screen_coord = $.TransformCoordinates($coord);
+        SDL_RenderDrawPoint($!render, $screen_coord.x, $screen_coord.y);
 
     }
 
@@ -46,7 +43,7 @@ class Canvas is export {
         SDL_RenderPresent($!render);
     }
 
-    method TransformCoordinates(Int $x, Int $y) {
-        ($.width / 2 + $x, $.height / 2 - $y)
+    method TransformCoordinates(Point2d $coord) returns Point2d {
+        Point2d.new(x => ($.width / 2 + $coord.x).Int, y => ($.height / 2 - $coord.y).Int)
     }
 }
