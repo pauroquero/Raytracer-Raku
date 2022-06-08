@@ -1,0 +1,21 @@
+{
+  "name": "ComputerGraphicsFromScratch",
+  "description": "Implementation of Computer Graphics From Scratch in Raku",
+  "version": "0.1",
+  "perl": "6.*",
+  "authors": [
+    ""
+  ],
+  "auth": "",
+  "depends": [
+    "SDL2::Raw"
+  ],
+  "build-depends": [],
+  "test-depends": [],
+  "provides": {
+    "CanvasSDL": "CanvasSDL.raku"
+  },
+  "resources": [],
+  "license": "",
+  "source-url": ""
+}
