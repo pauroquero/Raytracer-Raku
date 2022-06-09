@@ -21,7 +21,7 @@ class Canvas is export {
         $!window = SDL_CreateWindow(
                 "Canvas",
                 SDL_WINDOWPOS_CENTERED_MASK, SDL_WINDOWPOS_CENTERED_MASK,
-                $.width, $.height, SHOWN);
+                $!width, $!height, SHOWN);
 
         $!screen = SDL_GetWindowSurface($!window);
 
@@ -34,14 +34,14 @@ class Canvas is export {
         SDL_DestroyWindow($!window);
         SDL_Quit();
     }
-    method PutPixel(Point2d $coord, Color $color) {
+    method PutPixel(Point2d:D $coord, Color:D $color) {
 
         my Point2d $screen_coord = $.TransformCoordinates($coord);
 
         my CArray[uint32] $pixels = nativecast(CArray[uint32], $!screen.pixels);
         my uint32 $color_bin = SDL_MapRGBA($!screen.format, $color.r, $color.g, $color.b, 0xff);
         my UInt $offset = $screen_coord.x + $screen_coord.y * $!width;
-        if $offset > 0 && $offset < $.height * $.width - 10 {
+        if $offset > 0 && $offset < $!height * $!width - 10 {
             $pixels[$offset] = $color_bin;
         }
     }
@@ -64,7 +64,7 @@ class Canvas is export {
         SDL_LockSurface($!screen);
     }
 
-    method TransformCoordinates(Point2d $coord) returns Point2d {
-        Point2d.new(x => ($.width / 2 + $coord.x).floor.Int, y => ($.height / 2 - $coord.y).floor.Int)
+    method TransformCoordinates(Point2d:D $coord) returns Point2d:D {
+        Point2d.new(x => ($!width / 2 + $coord.x).floor.Int, y => ($!height / 2 - $coord.y).floor.Int)
     }
 }

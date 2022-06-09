@@ -11,10 +11,10 @@ class Sphere is export {
 
     has Color $.color;
 
-    method IntersectRay(Point3d $O, Point3d $D) {
-        my Num $r = $.radius;
+    method IntersectRay(Point3d:D $O, Point3d:D $D) {
+        my Num $r = $!radius;
 
-        my Point3d $CO = $O - $.center;
+        my Point3d $CO = $O - $!center;
 
         my Num $a = dot($D, $D);
         my Num $b = 2 * dot($CO, $D);

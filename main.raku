@@ -28,7 +28,26 @@ my $scene = Scene.new(spheres => [
             radius => 1.0.Num,
             color => Color.new(r => 0, g => 255, b => 0),
             ),
-]);
+    Sphere.new(
+            center => Point3d.new(x => 0.Num, y => -5001.Num, z => 0.Num),
+            radius => 5000.Num,
+            color => Color.new(r => 255, g => 255, b => 0),
+            ),
+],
+        lights => Lights.new(
+                ambient_lights => [
+                        AmbientLight.new(intensity => 0.2.Num)
+                ],
+                point_lights => [
+                        PointLight.new(intensity => 0.6.Num,
+                                position => Point3d.new(x => 2.Num, y => 1.Num, z => 0.Num))
+                ],
+                directional_lights => [
+                        DirectionalLight.new(intensity => 0.2.Num,
+                                direction => Point3d.new(x => 1.Num, y => 4.Num, z => 4.Num))
+                ],
+                )
+        );
 
 my $viewport = Viewport.new(canvas => $canvas);
 
