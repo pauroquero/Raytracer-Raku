@@ -44,7 +44,8 @@ class Lights is export {
     has @.point_lights of PointLight;
     has @.directional_lights of DirectionalLight;
 
-    method ComputeLighting(Point3d:D $point, Point3d:D $normal) returns Num:D {
+    method ComputeLighting(Point3d:D $point, Point3d:D $normal,
+                           Point3d:D $view_angle, Num:D $specular) returns Num:D {
         my Num $intensity = 0.0.Num;
 
         for @!ambient_lights -> $light {
@@ -53,22 +54,37 @@ class Lights is export {
 
         for @!point_lights -> $light {
             my Point3d $light_direction = $light.position - $point;
-            $intensity += $.DirectionIntensity($light, $light_direction, $normal);
+            $intensity += $.DirectionIntensity($light, $light_direction, $normal, $view_angle, $specular);
         }
 
         for @!directional_lights -> $light {
-            $intensity += $.DirectionIntensity($light, $light.direction, $normal);
+            $intensity += $.DirectionIntensity($light, $light.direction, $normal, $view_angle, $specular);
         }
         $intensity;
     }
     method DirectionIntensity(Light:D $light,
-                              Point3d:D $light_direction, Point3d:D $normal) returns Num:D {
+                              Point3d:D $light_direction, Point3d:D $normal,
+                              Point3d:D $view_angle, Num:D $specular) returns Num:D {
+        my Num $intensity = 0.Num;
+
+        # Diffuse
         my Num $dot_vectors = dot($light_direction, $normal);
         if $dot_vectors > 0 {
-            $light.intensity * $dot_vectors / ($light_direction.length * $normal.length);
-        } else {
-            0.Num;
+            $intensity += $light.intensity * $dot_vectors / ($light_direction.length * $normal.length);
         }
+
+        # Specular
+        if $specular != -1 {
+            my Point3d $reflected_direction = mul(2 * dot($normal, $light_direction), $normal) - $light_direction;
+            my Num $r_dot_v = dot($reflected_direction, $view_angle);
+            if $r_dot_v > 0 {
+                try {
+                    $intensity += $light.intensity * ($r_dot_v / ($reflected_direction.length * $view_angle
+                    .length)) ** $specular;
+                }
+            }
+        }
+        $intensity;
     }
 }
 
@@ -100,8 +116,8 @@ class Camera is export {
             }
             if $x mod 10 == 0 {
                 say "Rendering line $x";
-                $!canvas.Draw();
             }
+            $!canvas.Draw();
         }
     }
 
@@ -126,7 +142,8 @@ class Camera is export {
             my Point3d $collision_point = $origin + mul($closest_t, $D);
             my Point3d $normal = $collision_point - $closest_sphere.center;
             $normal = div($normal, $normal.length);
-            $closest_sphere.color.mul($scene.lights.ComputeLighting($collision_point, $normal));
+            $closest_sphere.color.mul($scene.lights.ComputeLighting($collision_point, $normal,
+                    -$D, $closest_sphere.specular));
         }
     }
 

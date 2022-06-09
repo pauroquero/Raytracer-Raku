@@ -16,22 +16,32 @@ my $scene = Scene.new(spheres => [
     Sphere.new(
             center => Point3d.new(x => 0.0.Num, y => -1.0.Num, z => 3.0.Num),
             radius => 1.0.Num,
-            color => Color.new(r => 255, g => 0, b => 0),
+            color => Color.new(r => 255, g => 0, b => 0), # Red
+            specular => 500.Num, # shiny
             ),
     Sphere.new(
             center => Point3d.new(x => 2.0.Num, y => 0.0.Num, z => 4.0.Num),
             radius => 1.0.Num,
-            color => Color.new(r => 0, g => 0, b => 255),
+            color => Color.new(r => 0, g => 0, b => 255), # Blue
+            specular => 500.Num, # shiny
             ),
     Sphere.new(
             center => Point3d.new(x => -2.0.Num, y => 0.0.Num, z => 4.0.Num),
             radius => 1.0.Num,
-            color => Color.new(r => 0, g => 255, b => 0),
+            color => Color.new(r => 0, g => 255, b => 0), # Green
+            specular => 10.Num, # Somewhat shiny
             ),
     Sphere.new(
             center => Point3d.new(x => 0.Num, y => -5001.Num, z => 0.Num),
             radius => 5000.Num,
-            color => Color.new(r => 255, g => 255, b => 0),
+            color => Color.new(r => 255, g => 255, b => 0), # Yellow
+            specular => 1000.Num # Very shiny
+            ),
+    Sphere.new(
+            center => Point3d.new(x => 0.Num, y => 0.2.Num, z => 3.Num),
+            radius => 0.25.Num,
+            color => Color.new(r => 255, g => 0, b => 200), # Yellow
+            specular => -1.Num # Not shiny
             ),
 ],
         lights => Lights.new(
@@ -60,7 +70,7 @@ my $camera = Camera.new(
 $camera.Render($scene);
 
 $canvas.Draw();
-sleep(5);
+#sleep(5);
 
 $canvas.Destroy();
 

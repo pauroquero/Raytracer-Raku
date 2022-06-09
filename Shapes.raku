@@ -11,6 +11,8 @@ class Sphere is export {
 
     has Color $.color;
 
+    has Num $.specular = -1;
+
     method IntersectRay(Point3d:D $O, Point3d:D $D) {
         my Num $r = $!radius;
 

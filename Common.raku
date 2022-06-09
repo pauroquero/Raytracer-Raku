@@ -9,9 +9,9 @@ class Color is export {
 
     method mul(Num:D $intensity) returns Color:D {
         Color.new(
-                r => ($!r * $intensity).Int,
-                g => ($!g * $intensity).Int,
-                b => ($!b * $intensity).Int,
+                r => min(($!r * $intensity), 255).Int,
+                g => min(($!g * $intensity),255).Int,
+                b => min(($!b * $intensity),255).Int,
                 );
     }
 }
@@ -33,6 +33,13 @@ class Point3d is export {
     }
 }
 
+multi prefix:<->(Point3d:D $x) returns Point3d:D is export {
+    Point3d.new(
+            x => -$x.x,
+            y => -$x.y,
+            z => -$x.z,
+            );
+}
 multi infix:<->(Point3d:D $lhs, Point3d:D $rhs) returns Point3d:D is export {
     Point3d.new(
             x => $lhs.x - $rhs.x,
