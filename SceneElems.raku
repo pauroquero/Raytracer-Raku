@@ -7,6 +7,7 @@ use Common;
 use CanvasSDL;
 use Shapes;
 
+class Scene is export {...}
 
 class Viewport is export {
     has Num $.width = 1.0.Num;
@@ -44,8 +45,8 @@ class Lights is export {
     has @.point_lights of PointLight;
     has @.directional_lights of DirectionalLight;
 
-    method ComputeLighting(Point3d:D $point, Point3d:D $normal,
-                           Point3d:D $view_angle, Num:D $specular) returns Num:D {
+    method ComputeLighting(Point3d:D $point, Point3d:D $normal, Point3d:D $view_angle,
+                           Num:D $specular, Scene:D $scene) returns Num:D {
         my Num $intensity = 0.0.Num;
 
         for @!ambient_lights -> $light {
@@ -54,18 +55,28 @@ class Lights is export {
 
         for @!point_lights -> $light {
             my Point3d $light_direction = $light.position - $point;
-            $intensity += $.DirectionIntensity($light, $light_direction, $normal, $view_angle, $specular);
+            $intensity += $.DirectionIntensity($light, $point, $light_direction,
+                    $normal, $view_angle, $specular, $scene, 1.Num);
         }
 
         for @!directional_lights -> $light {
-            $intensity += $.DirectionIntensity($light, $light.direction, $normal, $view_angle, $specular);
+            $intensity += $.DirectionIntensity($light, $point, $light.direction,
+                    $normal, $view_angle, $specular, $scene, Inf);
         }
         $intensity;
     }
-    method DirectionIntensity(Light:D $light,
+    method DirectionIntensity(Light:D $light, Point3d:D $point,
                               Point3d:D $light_direction, Point3d:D $normal,
-                              Point3d:D $view_angle, Num:D $specular) returns Num:D {
+                              Point3d:D $view_angle, Num:D $specular,
+                              $scene, Num:D $t_max) returns Num:D {
         my Num $intensity = 0.Num;
+
+        # Shadow check
+        my (Sphere:D $shadow_sphere, Num:D $closest_t) =
+                $scene.ClosestIntersection($point, $light_direction, 0.001.Num, $t_max);
+        if defined $shadow_sphere {
+            return 0.Num;
+        }
 
         # Diffuse
         my Num $dot_vectors = dot($light_direction, $normal);
@@ -92,6 +103,26 @@ class Lights is export {
 class Scene is export {
     has @.spheres of Sphere;
     has Lights $.lights;
+
+    method ClosestIntersection(Point3d:D $origin, Point3d:D $direction,
+                               num:D $t_min, num:D $t_max) {
+        my Num $closest_t = Inf;
+        my Sphere $closest_sphere = Nil;
+
+        for @!spheres -> Sphere $sphere {
+            my (Num $t1, Num $t2) = $sphere.IntersectRay($origin, $direction);
+            if $t_min < $t1 < $t_max && $t1 < $closest_t {
+                $closest_t = $t1;
+                $closest_sphere = $sphere;
+            }
+            if $t_min < $t2 < $t_max && $t2 < $closest_t {
+                $closest_t = $t2;
+                $closest_sphere = $sphere;
+            }
+        }
+
+        ($closest_sphere, $closest_t);
+    }
 }
 
 
@@ -121,29 +152,19 @@ class Camera is export {
         }
     }
 
-    method TraceRay(Point3d:D $origin, Point3d:D $D, Num:D $t_min, Num:D $t_max, Scene:D $scene) returns Color {
-        my Num $closest_t = Inf;
-        my Sphere $closest_sphere = Nil;
+    method TraceRay(Point3d:D $origin, Point3d:D $direction,
+                    Num:D $t_min, Num:D $t_max, Scene:D $scene) returns Color {
+        my (Sphere:D $closest_sphere, Num:D $closest_t) =
+                $scene.ClosestIntersection($origin, $direction, $t_min, $t_max);
 
-        for $scene.spheres -> Sphere $sphere {
-            my (Num $t1, Num $t2) = $sphere.IntersectRay($origin, $D);
-            if $t_min < $t1 < $t_max && $t1 < $closest_t {
-                $closest_t = $t1;
-                $closest_sphere = $sphere;
-            }
-            if $t_min < $t2 < $t_max && $t2 < $closest_t {
-                $closest_t = $t2;
-                $closest_sphere = $sphere;
-            }
-        }
         if !defined($closest_sphere) {
             BACKGROUND_COLOR;
         } else {
-            my Point3d $collision_point = $origin + mul($closest_t, $D);
+            my Point3d $collision_point = $origin + mul($closest_t, $direction);
             my Point3d $normal = $collision_point - $closest_sphere.center;
             $normal = div($normal, $normal.length);
             $closest_sphere.color.mul($scene.lights.ComputeLighting($collision_point, $normal,
-                    -$D, $closest_sphere.specular));
+                    -$direction, $closest_sphere.specular, $scene));
         }
     }
 
