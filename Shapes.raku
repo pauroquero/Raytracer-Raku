@@ -15,13 +15,13 @@ class Sphere is export {
 
     has num64 $.reflective = 0.Num;
 
-    method int64ersectRay(Point3d:D $O, Point3d:D $D) {
+    method intersectRay(Point3d:D $Origin, Point3d:D $Direction) {
         my num64 $r = $!radius;
 
-        my Point3d $CO = $O - $!center;
+        my Point3d $CO = $Origin - $!center;
 
-        my num64 $a = dot($D, $D);
-        my num64 $b = 2 * dot($CO, $D);
+        my num64 $a = dot($Direction, $Direction);
+        my num64 $b = 2 * dot($CO, $Direction);
         my num64 $c = dot($CO, $CO) - $r * $r;
 
         my num64 $discriminant = $b * $b - 4 * $a * $c;

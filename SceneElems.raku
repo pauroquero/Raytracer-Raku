@@ -59,17 +59,17 @@ class Lights is export {
 
         for @!point_lights -> $light {
             my Point3d $light_direction = $light.position - $point;
-            $intensity += $.Directionint64ensity($light, $point, $light_direction,
+            $intensity += $.Directionintensity($light, $point, $light_direction,
                     $normal, $view_angle, $specular, $scene, 1.0e0);
         }
 
         for @!directional_lights -> $light {
-            $intensity += $.Directionint64ensity($light, $point, $light.direction,
+            $intensity += $.Directionintensity($light, $point, $light.direction,
                     $normal, $view_angle, $specular, $scene, Inf);
         }
         $intensity;
     }
-    method Directionint64ensity(Light:D $light, Point3d:D $point,
+    method Directionintensity(Light:D $light, Point3d:D $point,
                               Point3d:D $light_direction, Point3d:D $normal,
                               Point3d:D $view_angle, num64:D $specular,
                               $scene, num64:D $t_max) returns num64 {
@@ -114,7 +114,7 @@ class Scene is export {
         my Sphere $closest_sphere = Nil;
 
         for @!spheres -> Sphere $sphere {
-            my (num64 $t1, num64 $t2) = $sphere.int64ersectRay($origin, $direction);
+            my (num64 $t1, num64 $t2) = $sphere.intersectRay($origin, $direction);
             if $t_min < $t1 < $t_max && $t1 < $closest_t {
                 $closest_t = $t1;
                 $closest_sphere = $sphere;
@@ -146,7 +146,7 @@ class Camera is export {
                 my $canvas_coord = Point2d.new(x => $x, y => $y);
 
                 my $D = $!viewport.CanvasToViewport($canvas_coord, $!canvas.width, $!canvas.height);
-                my $color = $.TraceRay($!position, $D, $!viewport.distance, Inf, $scene, 3.Int);
+                my $color = TraceRay($!position, $D, $!viewport.distance, Inf, $scene, 3.Int);
                 $!canvas.PutPixel($canvas_coord, $color);
             }
             if $x mod 10 == 0 {
@@ -155,40 +155,39 @@ class Camera is export {
             $!canvas.Draw();
         }
     }
+}
 
-    method TraceRay(Point3d:D $origin, Point3d:D $direction,
-                    num64:D $t_min, num64:D $t_max, Scene:D $scene,
-                    int64 $recursion_depth) returns Color {
-        my (Sphere:D $closest_sphere, num64:D $closest_t) =
-                $scene.Closestintersection($origin, $direction, $t_min, $t_max);
+sub TraceRay(Point3d:D $origin, Point3d:D $direction,
+                num64:D $t_min, num64:D $t_max, Scene:D $scene,
+                int64 $recursion_depth) returns Color {
+    my (Sphere:D $closest_sphere, num64:D $closest_t) =
+            $scene.Closestintersection($origin, $direction, $t_min, $t_max);
 
-        if !defined($closest_sphere) {
-            return BACKGROUND_COLOR;
-        }
-
-        # Compute local color
-        my Point3d $collision_point = $origin + mul($closest_t, $direction);
-        my Point3d $normal = $collision_point - $closest_sphere.center;
-        $normal = div($normal, $normal.length);
-        my Color $local_color = $closest_sphere.color.mul($scene.lights.ComputeLighting(
-                $collision_point, $normal,
-                -$direction, $closest_sphere.specular, $scene));
-
-        # this sphere is not reflective or we reach the recursion limit, return
-        my num64 $reflective = $closest_sphere.reflective;
-        if $recursion_depth < 0 || $reflective <= 0 {
-            return $local_color;
-        }
-
-        # Compute reflected color
-        my Point3d $reflected_ray = ReflectRay(-$direction, $normal);
-
-        my Color $reflected_color = $.TraceRay($collision_point, $reflected_ray,
-                0.001.Num, Inf.Num, $scene,
-                $recursion_depth - 1);
-
-        return $local_color.mul(1 - $reflective)
-            + $reflected_color.mul($reflective);
+    if !defined($closest_sphere) {
+        return BACKGROUND_COLOR;
     }
 
+    # Compute local color
+    my Point3d $collision_point = $origin + mul($closest_t, $direction);
+    my Point3d $normal = $collision_point - $closest_sphere.center;
+    $normal = div($normal, $normal.length);
+    my Color $local_color = $closest_sphere.color.mul($scene.lights.ComputeLighting(
+            $collision_point, $normal,
+            -$direction, $closest_sphere.specular, $scene));
+
+    # If this sphere is not reflective or we reach the recursion limit, return
+    my num64 $reflective = $closest_sphere.reflective;
+    if $recursion_depth < 0 || $reflective <= 0 {
+        return $local_color;
+    }
+
+    # Compute reflected color
+    my Point3d $reflected_ray = ReflectRay(-$direction, $normal);
+
+    my Color $reflected_color = TraceRay($collision_point, $reflected_ray,
+            0.001.Num, Inf.Num, $scene,
+            $recursion_depth - 1);
+
+    return $local_color.mul(1 - $reflective)
+            + $reflected_color.mul($reflective);
 }

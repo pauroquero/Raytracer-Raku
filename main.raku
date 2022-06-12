@@ -7,7 +7,7 @@ use CanvasSDL;
 use Shapes;
 use SceneElems;
 
-my $size = 980;
+my $size = 300;
 my $canvas = Canvas.new(height => $size, width => $size);
 
 $canvas.Initialize();
@@ -75,7 +75,7 @@ my $camera = Camera.new(
 $camera.Render($scene);
 
 $canvas.Draw();
-sleep(500);
+sleep(5);
 
 $canvas.Destroy();
 
