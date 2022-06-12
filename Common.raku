@@ -3,11 +3,11 @@ use v6.d;
 unit module Common;
 
 class Color is export {
-    has Int $.r is rw;
-    has Int $.g is rw;
-    has Int $.b is rw;
+    has int64 $.r is rw;
+    has int64 $.g is rw;
+    has int64 $.b is rw;
 
-    method mul(Num:D $intensity) returns Color:D {
+    method mul(num64:D $intensity) returns Color:D {
         Color.new(
                 r => min(($!r * $intensity), 255).Int,
                 g => min(($!g * $intensity),255).Int,
@@ -16,19 +16,27 @@ class Color is export {
     }
 }
 
+multi infix:<+>(Color:D $lhs, Color:D $rhs) returns Color:D is export {
+    Color.new(
+            r => min($lhs.r + $rhs.r, 255),
+            g => min($lhs.g + $rhs.g, 255),
+            b => min($lhs.b + $rhs.b, 255),
+            )
+}
+
 constant BACKGROUND_COLOR is export = Color.new(r => 0, g => 0, b => 0);
 
 class Point2d is export {
-    has Int $.x is rw;
-    has Int $.y is rw;
+    has int64 $.x is rw;
+    has int64 $.y is rw;
 }
 
 class Point3d is export {
-    has Num $.x is rw;
-    has Num $.y is rw;
-    has Num $.z is rw;
+    has num64 $.x is rw;
+    has num64 $.y is rw;
+    has num64 $.z is rw;
 
-    method length returns Num:D {
+    method length returns num64 {
         sqrt($!x**2 + $!y**2 + $!z**2);
     }
 }
@@ -56,7 +64,7 @@ multi infix:<+>(Point3d:D $lhs, Point3d:D $rhs) returns Point3d:D is export {
             )
 }
 
-sub mul (Num:D $lhs, Point3d:D $rhs) returns Point3d:D is export {
+sub mul (num64:D $lhs, Point3d:D $rhs) returns Point3d:D is export {
     Point3d.new(
             x => $lhs * $rhs.x,
             y => $lhs * $rhs.y,
@@ -64,7 +72,7 @@ sub mul (Num:D $lhs, Point3d:D $rhs) returns Point3d:D is export {
             )
 }
 
-sub div (Point3d:D $rhs, Num:D $lhs) returns Point3d:D is export {
+sub div (Point3d:D $rhs, num64:D $lhs) returns Point3d:D is export {
     Point3d.new(
             x => $rhs.x / $lhs,
             y => $rhs.y / $lhs,
@@ -72,6 +80,6 @@ sub div (Point3d:D $rhs, Num:D $lhs) returns Point3d:D is export {
             )
 }
 
-sub dot(Point3d:D $lhs, Point3d:D $rhs) returns Num:D is export {
+sub dot(Point3d:D $lhs, Point3d:D $rhs) returns num64 is export {
     $lhs.x * $rhs.x + $lhs.y * $rhs.y + $lhs.z * $rhs.z;
 }

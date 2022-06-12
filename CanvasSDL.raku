@@ -10,8 +10,8 @@ my &memset = $*KERNEL ~~ /win32/
         !! sub (Pointer $str, int32 $c, size_t $n) returns Pointer is symbol('memset') is native {*};
 
 class Canvas is export {
-    has Int $.width = 200;
-    has Int $.height = 200;
+    has int64 $.width = 200;
+    has int64 $.height = 200;
     has $!window;
     has $!render;
     has $!screen;
@@ -40,7 +40,7 @@ class Canvas is export {
 
         my CArray[uint32] $pixels = nativecast(CArray[uint32], $!screen.pixels);
         my uint32 $color_bin = SDL_MapRGBA($!screen.format, $color.r, $color.g, $color.b, 0xff);
-        my UInt $offset = $screen_coord.x + $screen_coord.y * $!width;
+        my uint64 $offset = $screen_coord.x + $screen_coord.y * $!width;
         if $offset > 0 && $offset < $!height * $!width - 10 {
             $pixels[$offset] = $color_bin;
         }
