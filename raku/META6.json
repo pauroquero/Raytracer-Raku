@@ -13,10 +13,10 @@
   "build-depends": [],
   "test-depends": [],
   "provides": {
-    "CanvasSDL": "CanvasSDL.raku",
-    "Common": "Common.raku",
-    "SceneElems": "SceneElems.raku",
-    "Shapes": "Shapes.raku"
+    "CanvasSDL": "CanvasSDL.rakumod",
+    "Common": "Common.rakumod",
+    "SceneElems": "SceneElems.rakumod",
+    "Shapes": "Shapes.rakumod"
   },
   "resources": [],
   "license": "",

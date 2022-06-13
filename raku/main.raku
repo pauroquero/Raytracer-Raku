@@ -75,7 +75,7 @@ my $camera = Camera.new(
 $camera.Render($scene);
 
 $canvas.Draw();
-sleep(5);
+#sleep(5);
 
 $canvas.Destroy();
 

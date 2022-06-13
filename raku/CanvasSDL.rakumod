@@ -41,7 +41,7 @@ class Canvas is export {
         my CArray[uint32] $pixels = nativecast(CArray[uint32], $!screen.pixels);
         my uint32 $color_bin = SDL_MapRGBA($!screen.format, $color.r, $color.g, $color.b, 0xff);
         my uint64 $offset = $screen_coord.x + $screen_coord.y * $!width;
-        if $offset > 0 && $offset < $!height * $!width - 10 {
+        if $offset > 0 && $offset < $!height * $!width {
             $pixels[$offset] = $color_bin;
         }
     }
