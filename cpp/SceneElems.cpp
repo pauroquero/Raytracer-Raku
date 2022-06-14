@@ -57,7 +57,6 @@ double Lights::Directionintensity(Light &light, Point3d point,
 	// Shadow check
 	std::pair<Sphere *, double> closest = scene.Closestintersection(point, light_direction, 0.001, t_max);
 	Sphere *shadow_sphere = closest.first;
-	double closest_t = closest.second;
 
 	if (shadow_sphere != nullptr) {
 		return 0;

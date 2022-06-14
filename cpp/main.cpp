@@ -13,9 +13,8 @@ using namespace std::chrono_literals;
 const int size = 1000;
 
 int main() {
-	Canvas canvas = Canvas{size, size};
+	Canvas canvas = Canvas(size, size);
 
-	canvas.Initialize();
 	Lights lights(
 			std::vector<AmbientLight>{
 			AmbientLight(0.2)
@@ -80,8 +79,6 @@ int main() {
 	canvas.Draw();
 	//std::this_thread::sleep_for(2000ms);
 
-
-	canvas.Destroy();
 
 	std::cout << "Finished\n";
 }

@@ -9,7 +9,7 @@ extern "C" {
 #include "CanvasSDL.h"
 
 
-void Canvas::Initialize() {
+Canvas::Canvas(int64_t width, int64_t height) : width(width), height(height) {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		std::cerr << "Error initializing sdl\n";
 		throw "";
@@ -26,7 +26,7 @@ void Canvas::Initialize() {
 
 }
 
-void Canvas::Destroy() {
+Canvas::~Canvas() {
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
@@ -37,7 +37,7 @@ void Canvas::PutPixel(Point2d coord, Color color) {
 
 	uint32_t *pixels = static_cast<uint32_t *>(screen->pixels);
 	uint32_t color_bin = SDL_MapRGBA(screen->format, color.r, color.g, color.b, 0xff);
-	uint64_t offset = screen_coord.x + screen_coord.y * width;
+	int64_t offset = screen_coord.x + screen_coord.y * width;
 	if (offset > 0 && offset < height * width) {
 		pixels[offset] = color_bin;
 	}

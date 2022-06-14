@@ -13,8 +13,8 @@ class Canvas {
 		SDL_Window *window;
 		SDL_Surface *screen;
 
-		void Initialize();
-		void Destroy();
+		Canvas(int64_t width, int64_t height);
+		~Canvas();
 		void PutPixel(Point2d coord, Color color);
 		void Draw();
 
